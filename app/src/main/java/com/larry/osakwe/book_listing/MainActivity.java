@@ -16,13 +16,17 @@ public class MainActivity extends AppCompatActivity {
 
 
         Button searchButton = (Button)findViewById(R.id.search_button);
-        final EditText textSearch = (EditText)findViewById(R.id.editText);
+
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                EditText textSearch = (EditText)findViewById(R.id.editText);
+                String entry = textSearch.getText().toString();
+
+
                 Intent searchIntent = new Intent(MainActivity.this, SearchActivity.class);
-                searchIntent.putExtra("searchEntry", textSearch.getText().toString());
+                searchIntent.putExtra("searchEntry", entry);
                 startActivity(searchIntent);
             }
         });

@@ -3,6 +3,7 @@ package com.larry.osakwe.book_listing;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +41,19 @@ public class QueryUtils {
         try {
             jsonResponse = makeHttpRequest(url);
             JSONObject baseJsonResponse = new JSONObject(jsonResponse);
+            JSONArray itemArray = baseJsonResponse.getJSONArray("items");
+
+            for (int i = 0; i < itemArray.length(); i++) {
+                JSONObject item = itemArray.getJSONObject(i);
+                JSONObject volumeInfo = item.getJSONObject("volumeInfo");
+                String title = volumeInfo.getString("title");
+                //String author = volumeInfo.getString("place");
+                //long date = properties.getLong("time");
+                //String aUrl = properties.getString("url");
+
+                books.add(new Book(title, "test", "test"));
+            }
+
             
 
         } catch (JSONException e) {
