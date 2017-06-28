@@ -1,20 +1,11 @@
 package com.larry.osakwe.book_listing;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 /**
@@ -34,31 +25,28 @@ public class QueryUtils {
 
         ArrayList<Book> books = new ArrayList<>();
 
-        URL url = createUrl(bookJSON);
-
-        String jsonResponse = null;
 
         try {
-            jsonResponse = makeHttpRequest(url);
-            JSONObject baseJsonResponse = new JSONObject(jsonResponse);
+
+            JSONObject baseJsonResponse = new JSONObject(bookJSON);
+
             JSONArray itemArray = baseJsonResponse.getJSONArray("items");
 
             for (int i = 0; i < itemArray.length(); i++) {
                 JSONObject item = itemArray.getJSONObject(i);
                 JSONObject volumeInfo = item.getJSONObject("volumeInfo");
                 String title = volumeInfo.getString("title");
-                //String author = volumeInfo.getString("place");
-                //long date = properties.getLong("time");
-                //String aUrl = properties.getString("url");
 
-                books.add(new Book(title, "test", "test"));
+                JSONArray authorArray = volumeInfo.getJSONArray("authors");
+
+                String authors = formatListOfAuthors(authorArray);
+
+
+                books.add(new Book(title, authors.toString(), "test"));
             }
 
-            
 
         } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -66,65 +54,23 @@ public class QueryUtils {
         return books;
     }
 
-    private static URL createUrl(String stringUrl) {
-        URL url = null;
-        try {
-            url = new URL(stringUrl);
-        } catch (MalformedURLException e) {
-            Log.e("QueryUtils", "Error with creating URL ", e);
-        }
-        return url;
-    }
+    public static String formatListOfAuthors(JSONArray authorsList) throws JSONException {
 
-    private static String makeHttpRequest(URL url) throws IOException {
-        String jsonResponse = "";
+        String authorsListInString = null;
 
-        if (url == null) {
-            return jsonResponse;
+        if (authorsList.length() == 0) {
+            return null;
         }
 
-        HttpURLConnection urlConnection = null;
-        InputStream inputStream = null;
-
-        try {
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            if (urlConnection.getResponseCode() == 200) {
-                inputStream = urlConnection.getInputStream();
-                jsonResponse = readFromStream(inputStream);
+        for (int i = 0; i < authorsList.length(); i++) {
+            if (i == 0) {
+                authorsListInString = authorsList.getString(0);
             } else {
-                Log.e("QueryUtils", "Error response code: " + urlConnection.getResponseCode());
-            }
-        } catch (IOException e) {
-            Log.e("QueryUtils", "Problem retrieving the earthquake JSON results.", e);
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (inputStream != null) {
-                inputStream.close();
+                authorsListInString += ", " + authorsList.getString(i);
             }
         }
-        return jsonResponse;
 
-    }
-
-    private static String readFromStream(InputStream inputStream) throws IOException {
-        StringBuilder output = new StringBuilder();
-        if (inputStream != null) {
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
-            BufferedReader reader = new BufferedReader(inputStreamReader);
-            String line = reader.readLine();
-            while (line != null) {
-                output.append(line);
-                line = reader.readLine();
-            }
-        }
-        return output.toString();
+        return authorsListInString;
     }
 
 
