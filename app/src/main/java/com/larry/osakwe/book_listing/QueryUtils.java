@@ -34,15 +34,17 @@ public class QueryUtils {
 
             for (int i = 0; i < itemArray.length(); i++) {
                 JSONObject item = itemArray.getJSONObject(i);
+
                 JSONObject volumeInfo = item.getJSONObject("volumeInfo");
                 String title = volumeInfo.getString("title");
-
                 JSONArray authorArray = volumeInfo.getJSONArray("authors");
-
                 String authors = formatListOfAuthors(authorArray);
+                JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
+                String image = imageLinks.getString("thumbnail");
 
 
-                books.add(new Book(title, authors.toString(), "test"));
+                books.add(new Book(title, authors.toString(), image));
+
             }
 
 

@@ -50,6 +50,8 @@ public class SearchActivity extends AppCompatActivity {
 
                     BookAsyncTask task = new BookAsyncTask();
                     task.execute();
+                    View loadSpinner = findViewById(R.id.loading_spinner);
+                    loadSpinner.setVisibility(View.INVISIBLE);
 
                 } else {
                     mEmptyStateTextView.setText("No internet connection.");
@@ -63,6 +65,18 @@ public class SearchActivity extends AppCompatActivity {
 
         bookListView.setEmptyView(mEmptyStateTextView);
         bookListView.setAdapter(mAdapter);
+
+
+        if (isNetworkOnline()) {
+
+            View loadSpinner = findViewById(R.id.loading_spinner);
+            loadSpinner.setVisibility(View.INVISIBLE);
+
+        } else {
+            mEmptyStateTextView.setText("No internet connection.");
+            View loadSpinner = findViewById(R.id.loading_spinner);
+            loadSpinner.setVisibility(View.GONE);
+        }
 
 
         if (savedInstanceState != null) {
